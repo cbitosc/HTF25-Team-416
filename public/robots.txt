@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://htf25-team-416.vercel.app
+
+# Sitemaps
+Sitemap: https://htf25-team-416.vercel.app/sitemap.xml

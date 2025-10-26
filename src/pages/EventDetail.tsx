@@ -9,24 +9,102 @@ const EventDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Mock event data
-    const event = {
-        id: id,
-        title: "Tech Summit 2025",
-        description:
-            "Join industry leaders for an inspiring day of innovation, networking, and cutting-edge technology discussions. This comprehensive summit will feature keynote speeches from renowned tech pioneers, interactive workshops, and networking sessions designed to foster collaboration and inspire innovation.\n\nWhether you're a startup founder, developer, investor, or tech enthusiast, this event offers valuable insights into the latest trends shaping the future of technology.",
-        date: "March 15, 2025",
-        time: "9:00 AM - 6:00 PM",
-        venue: "Silicon Valley Convention Center, 123 Innovation Drive, San Jose, CA",
-        attendees: 234,
-        capacity: 500,
-        organizer: "Tech Events Inc.",
-        type: "Conference",
+    // Mock events database
+    const eventsData = {
+        "1": {
+            id: "1",
+            title: "Tech Summit 2025",
+            description: "Join industry leaders for an inspiring day of innovation, networking, and cutting-edge technology discussions. This comprehensive summit will feature keynote speeches from renowned tech pioneers, interactive workshops, and networking sessions designed to foster collaboration and inspire innovation.\n\nWhether you're a startup founder, developer, investor, or tech enthusiast, this event offers valuable insights into the latest trends shaping the future of technology.",
+            date: "March 15, 2025",
+            time: "9:00 AM - 6:00 PM",
+            venue: "Silicon Valley Convention Center, 123 Innovation Drive, San Jose, CA",
+            attendees: 234,
+            capacity: 300,
+            organizer: "Tech Events Inc.",
+            type: "Conference",
+            price: "Free",
+            status: "Active"
+        },
+        "2": {
+            id: "2",
+            title: "Startup Pitch Night",
+            description: "An exciting evening where innovative startups present their groundbreaking ideas to a panel of experienced investors and industry experts. This event provides a unique opportunity for entrepreneurs to showcase their vision, receive valuable feedback, and potentially secure funding for their ventures.\n\nAttendees will witness compelling pitch presentations, engage in networking opportunities, and gain insights into the startup ecosystem from successful entrepreneurs and investors.",
+            date: "April 8, 2025",
+            time: "6:00 PM - 10:00 PM",
+            venue: "Innovation Hub, 456 Startup Boulevard, San Francisco, CA",
+            attendees: 89,
+            capacity: 150,
+            organizer: "Startup Accelerator",
+            type: "Networking",
+            price: "₹2,100",
+            status: "Active"
+        },
+        "3": {
+            id: "3",
+            title: "Web Dev Workshop",
+            description: "An intensive hands-on workshop designed for developers of all skill levels. Learn the latest web development technologies, best practices, and modern frameworks from industry experts.\n\nThis workshop covers React, Node.js, TypeScript, and modern development tools. Participants will build real-world projects and receive personalized guidance from experienced mentors.",
+            date: "February 28, 2025",
+            time: "10:00 AM - 4:00 PM",
+            venue: "CodeCamp Academy, 789 Developer Street, Austin, TX",
+            attendees: 156,
+            capacity: 200,
+            organizer: "CodeCamp Academy",
+            type: "Workshop",
+            price: "₹8,250",
+            status: "Completed"
+        },
+        "4": {
+            id: "4",
+            title: "AI Conference 2025",
+            description: "Explore the future of artificial intelligence with leading researchers, practitioners, and innovators. This comprehensive conference covers machine learning, deep learning, natural language processing, and ethical AI development.\n\nFeaturing keynote presentations, technical sessions, demo booths, and networking opportunities with AI professionals from around the world.",
+            date: "May 20, 2025",
+            time: "8:00 AM - 7:00 PM",
+            venue: "Grand Convention Center, 321 AI Avenue, Seattle, WA",
+            attendees: 0,
+            capacity: 500,
+            organizer: "AI Research Institute",
+            type: "Conference",
+            price: "₹24,925",
+            status: "Upcoming"
+        },
+        "5": {
+            id: "5",
+            title: "Design Thinking Workshop",
+            description: "Discover the power of human-centered design thinking methodology. This interactive workshop teaches participants how to approach complex problems with empathy, creativity, and systematic thinking.\n\nLearn to identify user needs, ideate innovative solutions, prototype rapidly, and test effectively. Perfect for designers, product managers, entrepreneurs, and anyone interested in creative problem-solving.",
+            date: "June 5, 2025",
+            time: "9:00 AM - 5:00 PM",
+            venue: "Creative Space, 654 Design District, Portland, OR",
+            attendees: 0,
+            capacity: 100,
+            organizer: "Design Institute",
+            type: "Workshop",
+            price: "₹12,425",
+            status: "Upcoming"
+        }
     };
 
-    const handleRSVP = () => {
-        toast.success("Successfully registered for the event!");
-    };
+    const event = eventsData[id as keyof typeof eventsData];
+
+    if (!event) {
+        return (
+            <div className="min-h-screen bg-background">
+                <Navbar />
+                <div className="pt-24 pb-20">
+                    <div className="container mx-auto px-4 max-w-3xl text-center">
+                        <h1 className="text-3xl font-bold mb-4">Event Not Found</h1>
+                        <p className="text-muted-foreground mb-8">The event you're looking for doesn't exist.</p>
+                        <Button onClick={() => navigate("/dashboard")}>
+                            ← Back to Dashboard
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // const handleRSVP = () => {
+    //     toast.success("Successfully registered for the event!");
+    // };
 
     const handleShare = () => {
         toast.success("Event link copied to clipboard!");
@@ -115,12 +193,19 @@ const EventDetail = () => {
                         <div className="lg:col-span-1">
                             <Card className="p-6 sticky top-24 space-y-6">
                                 <div>
-                                    <div className="text-3xl font-bold text-primary mb-1">Free</div>
-                                    <p className="text-sm text-muted-foreground">No registration fee</p>
+                                    <div className="text-3xl font-bold text-primary mb-1">{event.price}</div>
+                                    <p className="text-sm text-muted-foreground">
+                                        {event.price === "Free" ? "No registration fee" : "Registration fee"}
+                                    </p>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Button variant="gradient" size="lg" className="w-full" onClick={handleRSVP}>
+                                    <Button
+                                        variant="gradient"
+                                        size="lg"
+                                        className="w-full"
+                                        onClick={() => navigate(`/events/${id}/register`)}
+                                    >
                                         Register Now
                                     </Button>
                                     <Button variant="outline" size="lg" className="w-full">
@@ -174,8 +259,8 @@ const EventDetail = () => {
 
                     {/* Back Button */}
                     <div className="mt-8">
-                        <Button variant="ghost" onClick={() => navigate("/")}>
-                            ← Back to Events
+                        <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+                            ← Back to Dashboard
                         </Button>
                     </div>
                 </div>

@@ -25,8 +25,11 @@ const Navbar = () => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors font-medium">
               Events
             </Link>
-            <Link to="/about" className="text-foreground hover:text-primary transition-colors font-medium">
-              About
+            <Link to="/attendee" className="text-foreground hover:text-primary transition-colors font-medium">
+              My Dashboard
+            </Link>
+            <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
+              Organizer
             </Link>
             <Link to="/auth" className="text-foreground hover:text-primary transition-colors font-medium">
               Sign In
@@ -57,11 +60,18 @@ const Navbar = () => {
                 Events
               </Link>
               <Link
-                to="/about"
+                to="/attendee"
                 className="text-foreground hover:text-primary transition-colors font-medium py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                About
+                My Dashboard
+              </Link>
+              <Link
+                to="/dashboard"
+                className="text-foreground hover:text-primary transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Organizer
               </Link>
               <Link
                 to="/auth"

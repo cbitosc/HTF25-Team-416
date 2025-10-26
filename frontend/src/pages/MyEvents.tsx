@@ -16,6 +16,94 @@ const MyEvents = () => {
     const [completedEvents, setCompletedEvents] = useState<any[]>([]);
 
     useEffect(() => {
+        // Initialize mock registrations if none exist
+        const existingRegistrations = JSON.parse(localStorage.getItem('userRegistrations') || '[]');
+        if (existingRegistrations.length === 0) {
+            const mockRegistrations = [
+                {
+                    ticketId: "TKT-001",
+                    eventId: "1",
+                    eventTitle: "Tech Summit 2025",
+                    eventDate: "2025-11-15",
+                    eventVenue: "Convention Center, Hyderabad",
+                    registeredAt: "2025-01-15T10:30:00Z",
+                    status: "confirmed",
+                    price: 2100
+                },
+                {
+                    ticketId: "TKT-002",
+                    eventId: "1",
+                    eventTitle: "Tech Summit 2025",
+                    eventDate: "2025-11-15",
+                    eventVenue: "Convention Center, Hyderabad",
+                    registeredAt: "2025-01-20T14:15:00Z",
+                    status: "confirmed",
+                    price: 2100
+                },
+                {
+                    ticketId: "TKT-003",
+                    eventId: "2",
+                    eventTitle: "Startup Pitch Night",
+                    eventDate: "2025-12-05",
+                    eventVenue: "Innovation Hub, Bangalore",
+                    registeredAt: "2025-02-01T09:45:00Z",
+                    status: "confirmed",
+                    price: 8250
+                },
+                {
+                    ticketId: "TKT-004",
+                    eventId: "1",
+                    eventTitle: "Tech Summit 2025",
+                    eventDate: "2025-11-15",
+                    eventVenue: "Convention Center, Hyderabad",
+                    registeredAt: "2025-02-05T16:20:00Z",
+                    status: "confirmed",
+                    price: 2100
+                },
+                {
+                    ticketId: "TKT-005",
+                    eventId: "3",
+                    eventTitle: "AI & ML Workshop",
+                    eventDate: "2025-10-25",
+                    eventVenue: "Tech Park, Mumbai",
+                    registeredAt: "2025-02-10T11:30:00Z",
+                    status: "confirmed",
+                    price: 12425
+                },
+                {
+                    ticketId: "TKT-006",
+                    eventId: "2",
+                    eventTitle: "Startup Pitch Night",
+                    eventDate: "2025-12-05",
+                    eventVenue: "Innovation Hub, Bangalore",
+                    registeredAt: "2025-02-15T13:45:00Z",
+                    status: "confirmed",
+                    price: 8250
+                },
+                {
+                    ticketId: "TKT-007",
+                    eventId: "1",
+                    eventTitle: "Tech Summit 2025",
+                    eventDate: "2025-11-15",
+                    eventVenue: "Convention Center, Hyderabad",
+                    registeredAt: "2025-02-20T08:15:00Z",
+                    status: "confirmed",
+                    price: 2100
+                },
+                {
+                    ticketId: "TKT-008",
+                    eventId: "3",
+                    eventTitle: "AI & ML Workshop",
+                    eventDate: "2025-10-25",
+                    eventVenue: "Tech Park, Mumbai",
+                    registeredAt: "2025-02-25T15:30:00Z",
+                    status: "confirmed",
+                    price: 12425
+                }
+            ];
+            localStorage.setItem('userRegistrations', JSON.stringify(mockRegistrations));
+        }
+
         // Get user registrations from localStorage (in real app, fetch from API)
         const registrations = JSON.parse(localStorage.getItem('userRegistrations') || '[]');
         setUserRegistrations(registrations);

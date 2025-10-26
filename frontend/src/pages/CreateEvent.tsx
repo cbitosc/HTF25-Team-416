@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
 import { Calendar, MapPin, Upload, Image as ImageIcon, X } from "lucide-react";
+import { eventsAPI } from "@/lib/api";
 import { toast } from "sonner";
 
 const CreateEvent = () => {
@@ -79,19 +80,33 @@ const CreateEvent = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Log form data including image
-        const formData = new FormData(e.target as HTMLFormElement);
-        if (selectedImage) {
-            formData.append('eventImage', selectedImage);
-            console.log('Event image included:', selectedImage.name);
-        }
+        try {
+            const formData = new FormData(e.target as HTMLFormElement);
 
-        // Simulate event creation
-        setTimeout(() => {
+            // Get form values
+            const eventData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                date: formData.get('date'),
+                time: formData.get('time'),
+                venue: formData.get('venue'),
+                capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : undefined,
+                type: formData.get('type'),
+                price: 0, // Default price for now
+                media: selectedImage ? [imagePreview] : [] // Store image URL if uploaded
+            };
+
+            // Create event using API
+            await eventsAPI.createEvent(eventData);
+
             toast.success("Event created successfully!");
-            setIsLoading(false);
             navigate("/dashboard");
-        }, 1500);
+        } catch (error) {
+            console.error('Error creating event:', error);
+            toast.error(error instanceof Error ? error.message : "Failed to create event. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -160,8 +175,8 @@ const CreateEvent = () => {
                                 ) : (
                                     <div
                                         className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${isDragOver
-                                                ? 'border-primary bg-primary/5'
-                                                : 'border-border hover:border-primary'
+                                            ? 'border-primary bg-primary/5'
+                                            : 'border-border hover:border-primary'
                                             }`}
                                         onClick={handleImageClick}
                                         onDragOver={handleDragOver}

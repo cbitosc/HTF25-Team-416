@@ -1,10 +1,17 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, Menu, X } from "lucide-react";
+import { Calendar, Menu, X, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -25,18 +32,56 @@ const Navbar = () => {
             <Link to="/events" className="text-foreground hover:text-primary transition-colors font-medium">
               Events
             </Link>
-            <Link to="/attendee" className="text-foreground hover:text-primary transition-colors font-medium">
-              My Dashboard
-            </Link>
-            <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
-              Organizer
-            </Link>
-            <Link to="/auth" className="text-foreground hover:text-primary transition-colors font-medium">
-              Sign In
-            </Link>
-            <Button variant="gradient" size="default" asChild>
-              <Link to="/create-event">Create Event</Link>
-            </Button>
+
+            {/* Show dashboard links only if user is logged in */}
+            {user ? (
+              <>
+                {user.role === 'attendee' && (
+                  <>
+                    <Link to="/attendee" className="text-foreground hover:text-primary transition-colors font-medium">
+                      My Dashboard
+                    </Link>
+                    <Link to="/my-events" className="text-foreground hover:text-primary transition-colors font-medium">
+                      My Events
+                    </Link>
+                  </>
+                )}
+                {user.role === 'organizer' && (
+                  <>
+                    <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
+                      Organizer Dashboard
+                    </Link>
+                    <Link to="/events-conducted" className="text-foreground hover:text-primary transition-colors font-medium">
+                      Events Conducted
+                    </Link>
+                  </>
+                )}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span>{user.name}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth" className="text-foreground hover:text-primary transition-colors font-medium">
+                Sign In
+              </Link>
+            )}
+
+            {/* Show Create Event button only for organizers */}
+            {user?.role === 'organizer' && (
+              <Button variant="gradient" size="default" asChild>
+                <Link to="/create-event">Create Event</Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -59,32 +104,78 @@ const Navbar = () => {
               >
                 Events
               </Link>
-              <Link
-                to="/attendee"
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                My Dashboard
-              </Link>
-              <Link
-                to="/dashboard"
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Organizer
-              </Link>
-              <Link
-                to="/auth"
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <Button variant="gradient" size="default" asChild className="w-full">
-                <Link to="/create-event" onClick={() => setMobileMenuOpen(false)}>
-                  Create Event
+
+              {/* Show dashboard links only if user is logged in */}
+              {user ? (
+                <>
+                  {user.role === 'attendee' && (
+                    <>
+                      <Link
+                        to="/attendee"
+                        className="text-foreground hover:text-primary transition-colors font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        My Dashboard
+                      </Link>
+                      <Link
+                        to="/my-events"
+                        className="text-foreground hover:text-primary transition-colors font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        My Events
+                      </Link>
+                    </>
+                  )}
+                  {user.role === 'organizer' && (
+                    <>
+                      <Link
+                        to="/dashboard"
+                        className="text-foreground hover:text-primary transition-colors font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Organizer Dashboard
+                      </Link>
+                      <Link
+                        to="/events-conducted"
+                        className="text-foreground hover:text-primary transition-colors font-medium py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Events Conducted
+                      </Link>
+                    </>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                    <User className="w-4 h-4" />
+                    <span>{user.name}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full justify-start"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="text-foreground hover:text-primary transition-colors font-medium py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign In
                 </Link>
-              </Button>
+              )}
+
+              {/* Show Create Event button only for organizers */}
+              {user?.role === 'organizer' && (
+                <Button variant="gradient" size="default" asChild className="w-full">
+                  <Link to="/create-event" onClick={() => setMobileMenuOpen(false)}>
+                    Create Event
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         )}

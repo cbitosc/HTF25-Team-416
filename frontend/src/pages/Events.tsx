@@ -5,89 +5,70 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
-import { Calendar, MapPin, Search, Users, Star } from "lucide-react";
+import { Calendar, MapPin, Search, Users, Star, AlertCircle } from "lucide-react";
+import { eventsAPI } from "@/lib/api";
 
 const Events = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [events, setEvents] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Mock events data - in real app this would come from API
-        const mockEvents = [
-            {
-                id: "1",
-                title: "Tech Summit 2025",
-                date: "2025-11-15",
-                venue: "Convention Center, Hyderabad",
-                description: "Join us for the biggest tech summit of the year featuring industry leaders and cutting-edge innovations.",
-                price: "₹2,100",
-                category: "Technology",
-                attendees: 245,
-                rating: 4.8,
-                image: "/api/placeholder/400/200"
-            },
-            {
-                id: "2",
-                title: "Startup Pitch Night",
-                date: "2025-12-05",
-                venue: "Innovation Hub, Bangalore",
-                description: "Watch promising startups pitch their ideas to investors and industry experts.",
-                price: "₹8,250",
-                category: "Business",
-                attendees: 89,
-                rating: 4.6,
-                image: "/api/placeholder/400/200"
-            },
-            {
-                id: "3",
-                title: "AI & ML Workshop",
-                date: "2025-10-25",
-                venue: "Tech Park, Mumbai",
-                description: "Hands-on workshop covering the latest in Artificial Intelligence and Machine Learning.",
-                price: "₹12,425",
-                category: "Technology",
-                attendees: 156,
-                rating: 4.9,
-                image: "/api/placeholder/400/200"
-            },
-            {
-                id: "4",
-                title: "Digital Marketing Conference",
-                date: "2025-10-20",
-                venue: "Business Center, Delhi",
-                description: "Learn the latest digital marketing strategies from industry experts.",
-                price: "₹2,100",
-                category: "Marketing",
-                attendees: 312,
-                rating: 4.7,
-                image: "/api/placeholder/400/200"
-            },
-            {
-                id: "5",
-                title: "Web Development Bootcamp",
-                date: "2025-11-30",
-                venue: "Learning Center, Pune",
-                description: "Intensive bootcamp covering modern web development technologies and frameworks.",
-                price: "₹24,925",
-                category: "Technology",
-                attendees: 78,
-                rating: 4.5,
-                image: "/api/placeholder/400/200"
-            },
-            {
-                id: "6",
-                title: "Design Thinking Workshop",
-                date: "2025-12-10",
-                venue: "Creative Hub, Chennai",
-                description: "Learn design thinking methodologies to solve complex problems creatively.",
-                price: "₹6,500",
-                category: "Design",
-                attendees: 67,
-                rating: 4.4,
-                image: "/api/placeholder/400/200"
+        const fetchEvents = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await eventsAPI.getAllEvents();
+                setEvents(data);
+            } catch (err) {
+                console.error('Failed to fetch events:', err);
+                setError('Failed to load events. Please try again later.');
+                // Fallback to mock data if API fails
+                setEvents([
+                    {
+                        _id: "1",
+                        title: "Tech Summit 2025",
+                        date: "2025-11-15",
+                        venue: "Convention Center, Hyderabad",
+                        description: "Join us for the biggest tech summit of the year featuring industry leaders and cutting-edge innovations.",
+                        price: "₹2,100",
+                        category: "Technology",
+                        attendees: 245,
+                        rating: 4.8,
+                        image: "/api/placeholder/400/200"
+                    },
+                    {
+                        _id: "2",
+                        title: "Startup Pitch Night",
+                        date: "2025-12-05",
+                        venue: "Innovation Hub, Bangalore",
+                        description: "Watch promising startups pitch their ideas to investors and industry experts.",
+                        price: "₹8,250",
+                        category: "Business",
+                        attendees: 89,
+                        rating: 4.6,
+                        image: "/api/placeholder/400/200"
+                    },
+                    {
+                        _id: "3",
+                        title: "AI & ML Workshop",
+                        date: "2025-10-25",
+                        venue: "Tech Park, Mumbai",
+                        description: "Hands-on workshop covering the latest in Artificial Intelligence and Machine Learning.",
+                        price: "₹12,425",
+                        category: "Technology",
+                        attendees: 156,
+                        rating: 4.9,
+                        image: "/api/placeholder/400/200"
+                    }
+                ]);
+            } finally {
+                setLoading(false);
             }
-        ];
-        setEvents(mockEvents);
+        };
+
+        fetchEvents();
     }, []);
 
     const filteredEvents = events.filter(event =>
@@ -148,79 +129,96 @@ const Events = () => {
                     </div>
 
                     {/* Events Grid */}
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredEvents.map((event) => {
-                            const status = getEventStatus(event.date);
-                            return (
-                                <Card key={event.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-                                    <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 relative overflow-hidden">
-                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
-                                        <div className="absolute top-3 right-3">
-                                            <Badge className={status.color} variant="secondary">
-                                                {status.label}
-                                            </Badge>
-                                        </div>
-                                        <div className="absolute bottom-3 left-3 right-3">
-                                            <div className="flex items-center gap-2 text-white">
-                                                <Users className="w-4 h-4" />
-                                                <span className="text-sm font-medium">{event.attendees} attending</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1">
-                                                <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
-                                                    {event.title}
-                                                </CardTitle>
-                                                <Badge variant="outline" className="mt-2 text-xs">
-                                                    {event.category}
+                    {loading ? (
+                        <div className="text-center py-12">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                            <p className="text-muted-foreground">Loading events...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-12">
+                            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                            <p className="text-red-600 mb-4">{error}</p>
+                            <Button onClick={() => window.location.reload()}>
+                                Try Again
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredEvents.map((event) => {
+                                const status = getEventStatus(event.date);
+                                return (
+                                    <Card key={event._id || event.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+                                        <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
+                                            <div className="absolute top-3 right-3">
+                                                <Badge className={status.color} variant="secondary">
+                                                    {status.label}
                                                 </Badge>
                                             </div>
-                                        </div>
-                                    </CardHeader>
-
-                                    <CardContent className="space-y-3">
-                                        <CardDescription className="line-clamp-2">
-                                            {event.description}
-                                        </CardDescription>
-
-                                        <div className="space-y-2 text-sm">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-primary" />
-                                                <span>{formatDate(event.date)}</span>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <MapPin className="w-4 h-4 text-accent" />
-                                                <span className="text-muted-foreground truncate">{event.venue}</span>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                                                <span className="font-medium">{event.rating}</span>
-                                                <span className="text-muted-foreground">({event.attendees} reviews)</span>
+                                            <div className="absolute bottom-3 left-3 right-3">
+                                                <div className="flex items-center gap-2 text-white">
+                                                    <Users className="w-4 h-4" />
+                                                    <span className="text-sm font-medium">{event.attendees || 0} attending</span>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-2">
-                                            <div className="text-lg font-bold text-primary">
-                                                {event.price}
+                                        <CardHeader className="pb-3">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
+                                                        {event.title}
+                                                    </CardTitle>
+                                                    <Badge variant="outline" className="mt-2 text-xs">
+                                                        {event.category || 'General'}
+                                                    </Badge>
+                                                </div>
                                             </div>
-                                            <Button asChild className="group-hover:scale-105 transition-transform">
-                                                <Link to={`/events/${event.id}`}>
-                                                    View Details
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
-                    </div>
+                                        </CardHeader>
 
-                    {filteredEvents.length === 0 && (
+                                        <CardContent className="space-y-3">
+                                            <CardDescription className="line-clamp-2">
+                                                {event.description}
+                                            </CardDescription>
+
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="w-4 h-4 text-primary" />
+                                                    <span>{formatDate(event.date)}</span>
+                                                </div>
+
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="w-4 h-4 text-accent" />
+                                                    <span className="text-muted-foreground truncate">{event.venue}</span>
+                                                </div>
+
+                                                {event.rating && (
+                                                    <div className="flex items-center gap-2">
+                                                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                                        <span className="font-medium">{event.rating}</span>
+                                                        <span className="text-muted-foreground">({event.attendees || 0} reviews)</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-2">
+                                                <div className="text-lg font-bold text-primary">
+                                                    {event.price || 'Free'}
+                                                </div>
+                                                <Button asChild className="group-hover:scale-105 transition-transform">
+                                                    <Link to={`/events/${event._id || event.id}`}>
+                                                        View Details
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {!loading && !error && filteredEvents.length === 0 && (
                         <div className="text-center py-12">
                             <Calendar className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                             <h3 className="text-xl font-semibold mb-2">No events found</h3>

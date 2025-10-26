@@ -7,34 +7,46 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Mail, Lock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Auth = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [loginData, setLoginData] = useState({ email: "", password: "", rememberMe: false });
-    const [signupData, setSignupData] = useState({ name: "", email: "", password: "", agreeToTerms: false });
+    const [signupData, setSignupData] = useState({ name: "", email: "", password: "", role: "attendee", agreeToTerms: false });
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { login } = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const result = await login(loginData.email, loginData.password);
 
-            // Mock successful login
-            toast({
-                title: "Welcome back!",
-                description: "You have successfully signed in.",
-            });
+            if (result.success && result.user) {
+                toast({
+                    title: "Welcome back!",
+                    description: `You have successfully signed in as ${result.user.role}.`,
+                });
 
-            // Navigate to dashboard (or wherever appropriate)
-            navigate("/dashboard");
+                // Redirect based on user role
+                if (result.user.role === 'organizer') {
+                    navigate("/dashboard");
+                } else {
+                    navigate("/attendee");
+                }
+            } else {
+                toast({
+                    title: "Login Failed",
+                    description: result.error || "Invalid email or password. Please try again.",
+                    variant: "destructive",
+                });
+            }
         } catch (error) {
             toast({
                 title: "Error",
-                description: "Invalid email or password. Please try again.",
+                description: "Something went wrong. Please try again.",
                 variant: "destructive",
             });
         } finally {
@@ -56,8 +68,9 @@ const Auth = () => {
                 description: "Welcome to EventHub. Please check your email to verify your account.",
             });
 
-            // Navigate to dashboard
-            navigate("/dashboard");
+            // Navigate to login tab
+            // In a real app, you'd redirect to email verification
+            navigate("/auth");
         } catch (error) {
             toast({
                 title: "Error",
@@ -91,6 +104,14 @@ const Auth = () => {
 
                         {/* Login Tab */}
                         <TabsContent value="login">
+                            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Demo Accounts:</h3>
+                                <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                                    <div><strong>Organizer:</strong> org@gmail.com / 123</div>
+                                    <div><strong>Attendee:</strong> attendee@example.com / 123</div>
+                                </div>
+                            </div>
+
                             <form onSubmit={handleLogin} className="space-y-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="login-email" className="flex items-center gap-2">
@@ -237,6 +258,34 @@ const Auth = () => {
                                         required
                                         className="h-11"
                                     />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-sm font-medium">Account Type</Label>
+                                    <div className="flex gap-4">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="role"
+                                                value="attendee"
+                                                checked={signupData.role === "attendee"}
+                                                onChange={(e) => setSignupData({ ...signupData, role: e.target.value as "attendee" | "organizer" })}
+                                                className="text-primary"
+                                            />
+                                            <span>Attendee</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="role"
+                                                value="organizer"
+                                                checked={signupData.role === "organizer"}
+                                                onChange={(e) => setSignupData({ ...signupData, role: e.target.value as "attendee" | "organizer" })}
+                                                className="text-primary"
+                                            />
+                                            <span>Organizer</span>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">

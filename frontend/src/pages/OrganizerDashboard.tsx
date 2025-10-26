@@ -431,6 +431,7 @@ const OrganizerDashboard = () => {
                                                 <TableCell className="font-medium">
                                                     <Link
                                                         to={`/events/${event.id}`}
+                                                        state={{ fromOrganizer: true }}
                                                         className="text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
                                                     >
                                                         {event.title}

@@ -30,6 +30,16 @@ const Index = () => {
                             </p>
                         </div>
 
+                        {/* Quick Actions */}
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                            <Button size="lg" className="bg-primary hover:bg-primary/90" asChild>
+                                <Link to="/events">Browse Events</Link>
+                            </Button>
+                            <Button variant="outline" size="lg" asChild>
+                                <Link to="/auth">Get Started</Link>
+                            </Button>
+                        </div>
+
                         {/* Role Selection CTAs */}
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8">
                             <div className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition-colors group">

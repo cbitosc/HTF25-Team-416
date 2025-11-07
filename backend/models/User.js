@@ -1,0 +1,36 @@
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const { nanoid } = require('nanoid'); // Add this import
+
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['attendee', 'organizer'], default: 'attendee' },
+  organizerId: { type: String, unique: true, sparse: true }, // Custom unique ID for organizers
+  createdEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
+  joinedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }]
+}, { timestamps: true });
+
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Generate organizerId for organizers before saving
+userSchema.pre('save', function (next) {
+  if (this.role === 'organizer' && !this.organizerId) {
+    this.organizerId = nanoid(10); // Generate 10-character unique ID
+  }
+  next();
+});
+
+// Compare password method
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+}
+
+module.exports = mongoose.model('User', userSchema);
